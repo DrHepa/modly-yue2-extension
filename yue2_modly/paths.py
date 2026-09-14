@@ -53,7 +53,13 @@ def resolve_models_root(context=None, *, root=ROOT, state_file=STATE, env=None) 
         return _separate(matches.pop(), root)
     if state_file.is_file():
         state = read_json(state_file)
-        if state.get("extension_root") == str(root):
+        # Compare canonical paths, not raw strings: Windows can spell the same
+        # directory with an 8.3 alias, different casing, or forward slashes.
+        try:
+            saved_root = absolute_directory(state.get("extension_root"), "saved extension_root")
+        except (OSError, ValueError, RuntimeError):
+            saved_root = None  # Invalid/unresolvable state must not bind to this host.
+        if saved_root == root:
             return _separate(absolute_directory(state["models_root"], "saved models_root"), root)
     raise ValueError("[MODELS_DIR_MISSING] Set MODELS_DIR to Modly Settings > Storage > Models, then run Repair/setup. No download was attempted into a guessed folder.")
 

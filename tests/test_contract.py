@@ -94,10 +94,10 @@ class StorageTests(unittest.TestCase):
         return resolve_models_root(ctx,root=self.ext,state_file=self.state,env={} if env is None else env)
 
     def test_explicit_models_path(self):
-        self.assertEqual(self.resolve({'models_dir':str(self.models)}),self.models)
+        self.assertEqual(self.resolve({'models_dir':str(self.models)}),self.models.resolve())
     def test_host_binding(self):
         write_json(self.base/'host/settings.json',{'extensionsDir':str(self.ext.parent),'modelsDir':str(self.models)})
-        self.assertEqual(self.resolve(),self.models)
+        self.assertEqual(self.resolve(),self.models.resolve())
     def test_unrelated_settings_rejected(self):
         write_json(self.base/'host/settings.json',{'extensionsDir':str(self.base/'unrelated'),'modelsDir':str(self.models)})
         with self.assertRaises(ValueError):self.resolve()
@@ -105,10 +105,10 @@ class StorageTests(unittest.TestCase):
         write_json(self.state,{'extension_root':str(self.ext),'models_root':str(self.models)})
         fresh=self.base/'relocated'
         write_json(self.base/'host/settings.json',{'extensionsDir':str(self.ext.parent),'modelsDir':str(fresh)})
-        self.assertEqual(self.resolve(),fresh)
+        self.assertEqual(self.resolve(),fresh.resolve())
     def test_saved_state_bound_to_extension(self):
         write_json(self.state,{'extension_root':str(self.ext),'models_root':str(self.models)})
-        self.assertEqual(self.resolve(),self.models)
+        self.assertEqual(self.resolve(),self.models.resolve())
         write_json(self.state,{'extension_root':str(self.base/'other'),'models_root':str(self.models)})
         with self.assertRaises(ValueError):self.resolve()
     def test_conflicting_paths(self):
@@ -171,7 +171,7 @@ class BundleTests(unittest.TestCase):
     def tearDown(self):self.tmp.cleanup()
     def test_roundtrip(self):
         directory,data=bundles.locate(json.dumps(self.desc))
-        self.assertEqual(directory,self.dir)
+        self.assertEqual(directory,self.dir.resolve())
         self.assertEqual(data['kind'],'latents')
         self.assertEqual(bundles.array(directory/'latent.npy','latent').shape,(10,64))
     def test_modified_data_detected(self):
