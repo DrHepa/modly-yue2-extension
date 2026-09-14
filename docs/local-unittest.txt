@@ -1,0 +1,57 @@
+test_modified_data_detected (test_contract.BundleTests.test_modified_data_detected) ... ok
+test_modified_manifest_detected (test_contract.BundleTests.test_modified_manifest_detected) ... ok
+test_no_pickle_or_nonfinite (test_contract.BundleTests.test_no_pickle_or_nonfinite) ... ok
+test_path_traversal_rejected (test_contract.BundleTests.test_path_traversal_rejected) ... ok
+test_roundtrip (test_contract.BundleTests.test_roundtrip) ... ok
+test_semantic_range (test_contract.BundleTests.test_semantic_range) ... ok
+test_git_blob_algorithm (test_contract.LaneTests.test_git_blob_algorithm) ... ok
+test_old_cuda_rejected (test_contract.LaneTests.test_old_cuda_rejected) ... ok
+test_six_abi_platform_combinations (test_contract.LaneTests.test_six_abi_platform_combinations) ... ok
+test_windows_arm_is_not_falsely_supported (test_contract.LaneTests.test_windows_arm_is_not_falsely_supported) ... ok
+test_wrong_abi_rejected (test_contract.LaneTests.test_wrong_abi_rejected) ... ok
+test_false_is_false (test_contract.ManifestTests.test_false_is_false) ... ok
+test_invalid_params (test_contract.ManifestTests.test_invalid_params) ... ok
+test_lock_revisions_are_full_hashes (test_contract.ManifestTests.test_lock_revisions_are_full_hashes) ... ok
+test_manifest_regeneration (test_contract.ManifestTests.test_manifest_regeneration) ... ok
+test_request_json_validation (test_contract.ManifestTests.test_request_json_validation) ... ok
+test_unique_dispatch_and_types (test_contract.ManifestTests.test_unique_dispatch_and_types) ... ok
+test_unknown_node (test_contract.ManifestTests.test_unknown_node) ... ok
+test_upstream_sampling_defaults (test_contract.ManifestTests.test_upstream_sampling_defaults) ... ok
+test_diagnostics_one_terminal (test_contract.ProtocolTests.test_diagnostics_one_terminal) ... ok
+test_invalid_parameter_without_loading_model (test_contract.ProtocolTests.test_invalid_parameter_without_loading_model) ... ok
+test_missing_input_one_error (test_contract.ProtocolTests.test_missing_input_one_error) ... ok
+test_unknown_node_one_error (test_contract.ProtocolTests.test_unknown_node_one_error) ... ok
+test_atomic_utf8_json (test_contract.StorageTests.test_atomic_utf8_json) ... ok
+test_conflicting_paths (test_contract.StorageTests.test_conflicting_paths) ... ok
+test_explicit_models_path (test_contract.StorageTests.test_explicit_models_path) ... ok
+test_host_binding (test_contract.StorageTests.test_host_binding) ... ok
+test_missing_models_fails_closed (test_contract.StorageTests.test_missing_models_fails_closed) ... ok
+test_relocation_overrides_saved_state (test_contract.StorageTests.test_relocation_overrides_saved_state) ... ok
+test_safe_children (test_contract.StorageTests.test_safe_children) ... ok
+test_saved_state_bound_to_extension (test_contract.StorageTests.test_saved_state_bound_to_extension) ... ok
+test_symlinks_rejected (test_contract.StorageTests.test_symlinks_rejected) ... ok
+test_unrelated_settings_rejected (test_contract.StorageTests.test_unrelated_settings_rejected) ... ok
+test_verified_snapshot_reuse_and_corruption (test_contract.StorageTests.test_verified_snapshot_reuse_and_corruption) ... ok
+test_weights_not_inside_extension (test_contract.StorageTests.test_weights_not_inside_extension) ... ok
+test_batch_duplicate_ids_fail_before_pipeline (test_pipeline_adapter.AdapterTests.test_batch_duplicate_ids_fail_before_pipeline) ... ok
+test_batch_resume_skips_only_verified_complete_songs (test_pipeline_adapter.AdapterTests.test_batch_resume_skips_only_verified_complete_songs) ... ok
+test_cancellation_before_loading (test_pipeline_adapter.AdapterTests.test_cancellation_before_loading) ... ok
+test_changed_model_identity_rejected (test_pipeline_adapter.AdapterTests.test_changed_model_identity_rejected) ... ok
+test_encode_does_not_silently_resample (test_pipeline_adapter.AdapterTests.test_encode_does_not_silently_resample) ... ok
+test_encode_preserves_posterior_and_decode (test_pipeline_adapter.AdapterTests.test_encode_preserves_posterior_and_decode) ... ok
+test_full_staged_roundtrip (test_pipeline_adapter.AdapterTests.test_full_staged_roundtrip) ... ok
+test_full_vae_override_recorded (test_pipeline_adapter.AdapterTests.test_full_vae_override_recorded) ... ok
+test_generate_creates_native_audio_and_valid_hashes (test_pipeline_adapter.AdapterTests.test_generate_creates_native_audio_and_valid_hashes) ... ok
+test_import_native_complete_result (test_pipeline_adapter.AdapterTests.test_import_native_complete_result) ... ok
+test_import_standalone_native_latents (test_pipeline_adapter.AdapterTests.test_import_standalone_native_latents) ... ok
+test_inspect_audio_score_and_agent_package (test_pipeline_adapter.AdapterTests.test_inspect_audio_score_and_agent_package) ... ok
+test_off_has_no_abc (test_pipeline_adapter.AdapterTests.test_off_has_no_abc) ... ok
+test_progress_monotonic (test_pipeline_adapter.AdapterTests.test_progress_monotonic) ... ok
+test_render_exact_saved_plan_does_not_replan (test_pipeline_adapter.AdapterTests.test_render_exact_saved_plan_does_not_replan) ... ok
+test_render_external_abc (test_pipeline_adapter.AdapterTests.test_render_external_abc) ... ok
+test_request_json_agent_edits_are_new_requests (test_pipeline_adapter.AdapterTests.test_request_json_agent_edits_are_new_requests) ... ok
+
+----------------------------------------------------------------------
+Ran 52 tests in 4.011s
+
+OK

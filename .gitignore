@@ -1,0 +1,15 @@
+venv/
+venv.previous-*/
+vendor/
+__pycache__/
+*.pyc
+.pytest_cache/
+.setup-state.json
+.runtime-constraints.txt
+.installed-requirements.txt
+setup-config.json
+*.wav
+*.flac
+*.npy
+*.safetensors
+.setup.lock

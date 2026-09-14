@@ -1,0 +1,39 @@
+{
+  "audit_date": "2026-09-13",
+  "modly_release": "v0.4.2",
+  "source": {
+    "repository": "multimodal-art-projection/YuE",
+    "revision": "88da114a67df892af0329472073b96a5ef700b93",
+    "package": "yue2-infer",
+    "version": "0.1.6",
+    "git_blobs": {
+      "src/yue2/__init__.py": "1150d10e6c0e8f083fb12afa0da4ea0687cb8a6c",
+      "src/yue2/cli.py": "04f273f3f139f9a21b0e37f7074d6da6a94aad76",
+      "src/yue2/cuda_graph.py": "ab0c67d38b84bea822dde4c1595111f73858e842",
+      "src/yue2/fast.py": "c9d2da630251b00ca78ab877a1146ec4bab29857",
+      "src/yue2/modeling_vae.py": "79014d26619982b3eaa9b9c987c31d6f931930b0",
+      "src/yue2/modeling_yue2.py": "9e2b9924b6e277cab5905771ac9afc068267ee8b",
+      "src/yue2/nar.py": "cb0bccc2e7ec78c3775b986d165cc2604149be7d",
+      "src/yue2/pipeline.py": "9b6fc438d3ab2bba17121594ccb763bfa69db343",
+      "src/yue2/progress.py": "c5ad7b172977e0e7db731eec7e10051f26c8b067",
+      "src/yue2/protocol.py": "8cf36506c02abf17ee6e2bbc50c7df46b9252599",
+      "src/yue2/quantization.py": "f77aab663d24ea65389793a010758e57c22560b3",
+      "src/yue2/sampling.py": "9673842079d5cb43fd540f444e2393ebb790739f",
+      "src/yue2/storage.py": "f9a252cb044115b2ad392a5deec1565937fd676c",
+      "src/yue2/tokenization_yue2.py": "9837504bccde457ad7e03f17ef2b64fe39e5f285",
+      "pyproject.toml": "513c0c41b9103687f34f80d23900080dfc9f6e0c",
+      "LICENSE": "d645695673349e3947e8e5ae42332d0ac3164cd7",
+      "MODEL_LICENSE": "3eb8414150a68611331deb67eb120e184c3a0e91",
+      "THIRD_PARTY_NOTICES.md": "4b8e5d555cb0a3a1878755f5ca44f6a5a846926a",
+      "licenses/SnakeBeta-NVIDIA-MIT.txt": "0ac31a6423eba7a0b83ccce6a2b511ed974b2b2d",
+      "licenses/stable-audio-tools-MIT.txt": "f119f94cf2ec8269020dd0d8140a4c4b83cc65a1",
+      "MANIFEST.in": "e3d5cb57e6a8ab39182680d2a822c477c66f9489",
+      "README.md": "2501e1c70a219896ce46cbbf5768d747ee2b5699"
+    }
+  },
+  "weights": {
+    "mot": {"repo_id": "m-a-p/YuE2-3B", "revision": "29b3558dd46954a0cd9021dc76d5c91864a0f1c7", "directory": "YuE2-3B"},
+    "vae": {"repo_id": "m-a-p/YuE2-Vae", "revision": "9a94e1d0ea9f8087e98f77fa88df4a4068104d2a", "directory": "YuE2-Vae"},
+    "vae_legacy": {"repo_id": "m-a-p/YuE2-Vae-legacy", "revision": "b54118f0fc462f08999d1ec07e88817f4ee3f770", "directory": "YuE2-Vae-legacy"}
+  }
+}

@@ -1,0 +1,1976 @@
+{
+  "id": "modly-yue2-extension",
+  "name": "YuE2",
+  "type": "process",
+  "entry": "processor.py",
+  "version": "0.1.0",
+  "author": "DrHepa",
+  "description": "YuE2 song generation, symbolic plans, ABC covers and edits, staged audio synthesis and VAE tools. Local setup-managed shared weights.",
+  "nodes": [
+    {
+      "id": "generate",
+      "name": "YuE2 \u00b7 Generate Song",
+      "input": "text",
+      "output": "audio",
+      "params_schema": [
+        {
+          "id": "input_mode",
+          "label": "Text input contains",
+          "type": "select",
+          "default": "lyrics",
+          "options": [
+            {
+              "value": "lyrics",
+              "label": "lyrics"
+            },
+            {
+              "value": "request-json",
+              "label": "request-json"
+            }
+          ]
+        },
+        {
+          "id": "song_id",
+          "label": "Song identifier",
+          "type": "string",
+          "default": "song"
+        },
+        {
+          "id": "style",
+          "label": "Style tags",
+          "type": "string",
+          "default": "cinematic, warm vocals, piano"
+        },
+        {
+          "id": "lyrics",
+          "label": "Lyrics (text input takes priority)",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "id": "lyrics_file",
+          "label": "Lyrics file",
+          "type": "string",
+          "default": "",
+          "pickerIntent": "text"
+        },
+        {
+          "id": "cot",
+          "label": "Symbolic planning",
+          "type": "select",
+          "default": "full",
+          "options": [
+            {
+              "value": "full",
+              "label": "full"
+            },
+            {
+              "value": "melody",
+              "label": "melody"
+            },
+            {
+              "value": "off",
+              "label": "off"
+            }
+          ]
+        },
+        {
+          "id": "seed",
+          "label": "Seed",
+          "type": "int",
+          "default": 831001,
+          "min": 0,
+          "max": 2147483647
+        },
+        {
+          "id": "cfg_mode",
+          "label": "CFG",
+          "type": "select",
+          "default": "native",
+          "options": [
+            {
+              "value": "native",
+              "label": "native"
+            },
+            {
+              "value": "custom",
+              "label": "custom"
+            }
+          ]
+        },
+        {
+          "id": "cfg_scale",
+          "label": "Custom CFG scale",
+          "type": "float",
+          "default": 1.0,
+          "min": 0,
+          "max": 20
+        },
+        {
+          "id": "device",
+          "label": "Device",
+          "type": "select",
+          "default": "cuda",
+          "options": [
+            {
+              "value": "cuda",
+              "label": "cuda"
+            },
+            {
+              "value": "cpu",
+              "label": "cpu"
+            }
+          ]
+        },
+        {
+          "id": "backend",
+          "label": "AR backend",
+          "type": "select",
+          "default": "torch",
+          "options": [
+            {
+              "value": "torch",
+              "label": "torch"
+            },
+            {
+              "value": "torch-eager",
+              "label": "torch-eager"
+            },
+            {
+              "value": "vllm",
+              "label": "vllm"
+            }
+          ]
+        },
+        {
+          "id": "quantization",
+          "label": "AR quantization (FP8 experimental)",
+          "type": "select",
+          "default": "none",
+          "options": [
+            {
+              "value": "none",
+              "label": "none"
+            },
+            {
+              "value": "fp8",
+              "label": "fp8"
+            }
+          ]
+        },
+        {
+          "id": "memory_budget_gib",
+          "label": "GPU memory budget (GiB)",
+          "type": "float",
+          "default": 24,
+          "min": 3,
+          "max": 512
+        },
+        {
+          "id": "offload_ar",
+          "label": "Offload AR during acoustic synthesis",
+          "type": "select",
+          "default": "false",
+          "options": [
+            {
+              "value": "false",
+              "label": "false"
+            },
+            {
+              "value": "true",
+              "label": "true"
+            }
+          ]
+        },
+        {
+          "id": "decoder",
+          "label": "VAE decoder",
+          "type": "select",
+          "default": "default",
+          "options": [
+            {
+              "value": "default",
+              "label": "default"
+            },
+            {
+              "value": "legacy",
+              "label": "legacy"
+            }
+          ]
+        },
+        {
+          "id": "vae_core_frames",
+          "label": "VAE core frames (0 = native default)",
+          "type": "int",
+          "default": 0,
+          "min": 0,
+          "max": 24576
+        },
+        {
+          "id": "full_decode",
+          "label": "Full VAE decode instead of tiled",
+          "type": "select",
+          "default": "false",
+          "options": [
+            {
+              "value": "false",
+              "label": "false"
+            },
+            {
+              "value": "true",
+              "label": "true"
+            }
+          ]
+        },
+        {
+          "id": "audio_format",
+          "label": "Primary audio format",
+          "type": "select",
+          "default": "wav",
+          "options": [
+            {
+              "value": "wav",
+              "label": "wav"
+            },
+            {
+              "value": "flac",
+              "label": "flac"
+            }
+          ]
+        },
+        {
+          "id": "abc_temperature",
+          "label": "ABC temperature",
+          "type": "float",
+          "default": 0.7,
+          "min": 0,
+          "max": 5
+        },
+        {
+          "id": "abc_top_p",
+          "label": "ABC top p",
+          "type": "float",
+          "default": 0.9,
+          "min": 1e-06,
+          "max": 1
+        },
+        {
+          "id": "abc_top_k",
+          "label": "ABC top k",
+          "type": "int",
+          "default": 30,
+          "min": 1,
+          "max": 184704
+        },
+        {
+          "id": "abc_repetition_penalty",
+          "label": "ABC repetition penalty",
+          "type": "float",
+          "default": 1.005,
+          "min": 1e-06,
+          "max": 100
+        },
+        {
+          "id": "abc_penalty_window",
+          "label": "ABC penalty window",
+          "type": "int",
+          "default": 100,
+          "min": 1,
+          "max": 100
+        },
+        {
+          "id": "abc_min_tokens",
+          "label": "ABC min tokens",
+          "type": "int",
+          "default": 32,
+          "min": 0,
+          "max": 24576
+        },
+        {
+          "id": "abc_max_tokens",
+          "label": "ABC max tokens",
+          "type": "int",
+          "default": 4096,
+          "min": 1,
+          "max": 24576
+        },
+        {
+          "id": "semantic_temperature",
+          "label": "SEMANTIC temperature",
+          "type": "float",
+          "default": 1.0,
+          "min": 0,
+          "max": 5
+        },
+        {
+          "id": "semantic_top_p",
+          "label": "SEMANTIC top p",
+          "type": "float",
+          "default": 0.95,
+          "min": 1e-06,
+          "max": 1
+        },
+        {
+          "id": "semantic_top_k",
+          "label": "SEMANTIC top k",
+          "type": "int",
+          "default": 100,
+          "min": 1,
+          "max": 184704
+        },
+        {
+          "id": "semantic_repetition_penalty",
+          "label": "SEMANTIC repetition penalty",
+          "type": "float",
+          "default": 1.2,
+          "min": 1e-06,
+          "max": 100
+        },
+        {
+          "id": "semantic_penalty_window",
+          "label": "SEMANTIC penalty window",
+          "type": "int",
+          "default": 50,
+          "min": 1,
+          "max": 100
+        },
+        {
+          "id": "semantic_min_tokens",
+          "label": "SEMANTIC min tokens",
+          "type": "int",
+          "default": 200,
+          "min": 0,
+          "max": 24576
+        },
+        {
+          "id": "semantic_max_tokens",
+          "label": "SEMANTIC max tokens",
+          "type": "int",
+          "default": 9000,
+          "min": 1,
+          "max": 24576
+        },
+        {
+          "id": "ode_steps",
+          "label": "Acoustic midpoint ODE steps",
+          "type": "int",
+          "default": 32,
+          "min": 1,
+          "max": 1000
+        }
+      ]
+    },
+    {
+      "id": "plan",
+      "name": "YuE2 \u00b7 Plan Score",
+      "input": "text",
+      "output": "text",
+      "params_schema": [
+        {
+          "id": "input_mode",
+          "label": "Text input contains",
+          "type": "select",
+          "default": "lyrics",
+          "options": [
+            {
+              "value": "lyrics",
+              "label": "lyrics"
+            },
+            {
+              "value": "request-json",
+              "label": "request-json"
+            }
+          ]
+        },
+        {
+          "id": "song_id",
+          "label": "Song identifier",
+          "type": "string",
+          "default": "song"
+        },
+        {
+          "id": "style",
+          "label": "Style tags",
+          "type": "string",
+          "default": "cinematic, warm vocals, piano"
+        },
+        {
+          "id": "lyrics",
+          "label": "Lyrics (text input takes priority)",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "id": "lyrics_file",
+          "label": "Lyrics file",
+          "type": "string",
+          "default": "",
+          "pickerIntent": "text"
+        },
+        {
+          "id": "cot",
+          "label": "Symbolic planning",
+          "type": "select",
+          "default": "full",
+          "options": [
+            {
+              "value": "full",
+              "label": "full"
+            },
+            {
+              "value": "melody",
+              "label": "melody"
+            },
+            {
+              "value": "off",
+              "label": "off"
+            }
+          ]
+        },
+        {
+          "id": "seed",
+          "label": "Seed",
+          "type": "int",
+          "default": 831001,
+          "min": 0,
+          "max": 2147483647
+        },
+        {
+          "id": "cfg_mode",
+          "label": "CFG",
+          "type": "select",
+          "default": "native",
+          "options": [
+            {
+              "value": "native",
+              "label": "native"
+            },
+            {
+              "value": "custom",
+              "label": "custom"
+            }
+          ]
+        },
+        {
+          "id": "cfg_scale",
+          "label": "Custom CFG scale",
+          "type": "float",
+          "default": 1.0,
+          "min": 0,
+          "max": 20
+        },
+        {
+          "id": "device",
+          "label": "Device",
+          "type": "select",
+          "default": "cuda",
+          "options": [
+            {
+              "value": "cuda",
+              "label": "cuda"
+            },
+            {
+              "value": "cpu",
+              "label": "cpu"
+            }
+          ]
+        },
+        {
+          "id": "backend",
+          "label": "AR backend",
+          "type": "select",
+          "default": "torch",
+          "options": [
+            {
+              "value": "torch",
+              "label": "torch"
+            },
+            {
+              "value": "torch-eager",
+              "label": "torch-eager"
+            },
+            {
+              "value": "vllm",
+              "label": "vllm"
+            }
+          ]
+        },
+        {
+          "id": "quantization",
+          "label": "AR quantization (FP8 experimental)",
+          "type": "select",
+          "default": "none",
+          "options": [
+            {
+              "value": "none",
+              "label": "none"
+            },
+            {
+              "value": "fp8",
+              "label": "fp8"
+            }
+          ]
+        },
+        {
+          "id": "memory_budget_gib",
+          "label": "GPU memory budget (GiB)",
+          "type": "float",
+          "default": 24,
+          "min": 3,
+          "max": 512
+        },
+        {
+          "id": "abc_temperature",
+          "label": "ABC temperature",
+          "type": "float",
+          "default": 0.7,
+          "min": 0,
+          "max": 5
+        },
+        {
+          "id": "abc_top_p",
+          "label": "ABC top p",
+          "type": "float",
+          "default": 0.9,
+          "min": 1e-06,
+          "max": 1
+        },
+        {
+          "id": "abc_top_k",
+          "label": "ABC top k",
+          "type": "int",
+          "default": 30,
+          "min": 1,
+          "max": 184704
+        },
+        {
+          "id": "abc_repetition_penalty",
+          "label": "ABC repetition penalty",
+          "type": "float",
+          "default": 1.005,
+          "min": 1e-06,
+          "max": 100
+        },
+        {
+          "id": "abc_penalty_window",
+          "label": "ABC penalty window",
+          "type": "int",
+          "default": 100,
+          "min": 1,
+          "max": 100
+        },
+        {
+          "id": "abc_min_tokens",
+          "label": "ABC min tokens",
+          "type": "int",
+          "default": 32,
+          "min": 0,
+          "max": 24576
+        },
+        {
+          "id": "abc_max_tokens",
+          "label": "ABC max tokens",
+          "type": "int",
+          "default": 4096,
+          "min": 1,
+          "max": 24576
+        }
+      ]
+    },
+    {
+      "id": "render-abc",
+      "name": "YuE2 \u00b7 Render ABC / Cover / Edit",
+      "input": "text",
+      "output": "audio",
+      "params_schema": [
+        {
+          "id": "abc",
+          "label": "External ABC score",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "id": "abc_file",
+          "label": "ABC file",
+          "type": "string",
+          "default": "",
+          "pickerIntent": "text"
+        },
+        {
+          "id": "song_id",
+          "label": "Song identifier",
+          "type": "string",
+          "default": "song"
+        },
+        {
+          "id": "style",
+          "label": "Style tags",
+          "type": "string",
+          "default": "cinematic, warm vocals, piano"
+        },
+        {
+          "id": "lyrics",
+          "label": "Lyrics (text input takes priority)",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "id": "lyrics_file",
+          "label": "Lyrics file",
+          "type": "string",
+          "default": "",
+          "pickerIntent": "text"
+        },
+        {
+          "id": "cot",
+          "label": "Symbolic planning",
+          "type": "select",
+          "default": "full",
+          "options": [
+            {
+              "value": "full",
+              "label": "full"
+            },
+            {
+              "value": "melody",
+              "label": "melody"
+            },
+            {
+              "value": "off",
+              "label": "off"
+            }
+          ]
+        },
+        {
+          "id": "seed",
+          "label": "Seed",
+          "type": "int",
+          "default": 831001,
+          "min": 0,
+          "max": 2147483647
+        },
+        {
+          "id": "cfg_mode",
+          "label": "CFG",
+          "type": "select",
+          "default": "native",
+          "options": [
+            {
+              "value": "native",
+              "label": "native"
+            },
+            {
+              "value": "custom",
+              "label": "custom"
+            }
+          ]
+        },
+        {
+          "id": "cfg_scale",
+          "label": "Custom CFG scale",
+          "type": "float",
+          "default": 1.0,
+          "min": 0,
+          "max": 20
+        },
+        {
+          "id": "device",
+          "label": "Device",
+          "type": "select",
+          "default": "cuda",
+          "options": [
+            {
+              "value": "cuda",
+              "label": "cuda"
+            },
+            {
+              "value": "cpu",
+              "label": "cpu"
+            }
+          ]
+        },
+        {
+          "id": "backend",
+          "label": "AR backend",
+          "type": "select",
+          "default": "torch",
+          "options": [
+            {
+              "value": "torch",
+              "label": "torch"
+            },
+            {
+              "value": "torch-eager",
+              "label": "torch-eager"
+            },
+            {
+              "value": "vllm",
+              "label": "vllm"
+            }
+          ]
+        },
+        {
+          "id": "quantization",
+          "label": "AR quantization (FP8 experimental)",
+          "type": "select",
+          "default": "none",
+          "options": [
+            {
+              "value": "none",
+              "label": "none"
+            },
+            {
+              "value": "fp8",
+              "label": "fp8"
+            }
+          ]
+        },
+        {
+          "id": "memory_budget_gib",
+          "label": "GPU memory budget (GiB)",
+          "type": "float",
+          "default": 24,
+          "min": 3,
+          "max": 512
+        },
+        {
+          "id": "offload_ar",
+          "label": "Offload AR during acoustic synthesis",
+          "type": "select",
+          "default": "false",
+          "options": [
+            {
+              "value": "false",
+              "label": "false"
+            },
+            {
+              "value": "true",
+              "label": "true"
+            }
+          ]
+        },
+        {
+          "id": "decoder",
+          "label": "VAE decoder",
+          "type": "select",
+          "default": "default",
+          "options": [
+            {
+              "value": "default",
+              "label": "default"
+            },
+            {
+              "value": "legacy",
+              "label": "legacy"
+            }
+          ]
+        },
+        {
+          "id": "vae_core_frames",
+          "label": "VAE core frames (0 = native default)",
+          "type": "int",
+          "default": 0,
+          "min": 0,
+          "max": 24576
+        },
+        {
+          "id": "full_decode",
+          "label": "Full VAE decode instead of tiled",
+          "type": "select",
+          "default": "false",
+          "options": [
+            {
+              "value": "false",
+              "label": "false"
+            },
+            {
+              "value": "true",
+              "label": "true"
+            }
+          ]
+        },
+        {
+          "id": "audio_format",
+          "label": "Primary audio format",
+          "type": "select",
+          "default": "wav",
+          "options": [
+            {
+              "value": "wav",
+              "label": "wav"
+            },
+            {
+              "value": "flac",
+              "label": "flac"
+            }
+          ]
+        },
+        {
+          "id": "abc_temperature",
+          "label": "ABC temperature",
+          "type": "float",
+          "default": 0.7,
+          "min": 0,
+          "max": 5
+        },
+        {
+          "id": "abc_top_p",
+          "label": "ABC top p",
+          "type": "float",
+          "default": 0.9,
+          "min": 1e-06,
+          "max": 1
+        },
+        {
+          "id": "abc_top_k",
+          "label": "ABC top k",
+          "type": "int",
+          "default": 30,
+          "min": 1,
+          "max": 184704
+        },
+        {
+          "id": "abc_repetition_penalty",
+          "label": "ABC repetition penalty",
+          "type": "float",
+          "default": 1.005,
+          "min": 1e-06,
+          "max": 100
+        },
+        {
+          "id": "abc_penalty_window",
+          "label": "ABC penalty window",
+          "type": "int",
+          "default": 100,
+          "min": 1,
+          "max": 100
+        },
+        {
+          "id": "abc_min_tokens",
+          "label": "ABC min tokens",
+          "type": "int",
+          "default": 32,
+          "min": 0,
+          "max": 24576
+        },
+        {
+          "id": "abc_max_tokens",
+          "label": "ABC max tokens",
+          "type": "int",
+          "default": 4096,
+          "min": 1,
+          "max": 24576
+        },
+        {
+          "id": "semantic_temperature",
+          "label": "SEMANTIC temperature",
+          "type": "float",
+          "default": 1.0,
+          "min": 0,
+          "max": 5
+        },
+        {
+          "id": "semantic_top_p",
+          "label": "SEMANTIC top p",
+          "type": "float",
+          "default": 0.95,
+          "min": 1e-06,
+          "max": 1
+        },
+        {
+          "id": "semantic_top_k",
+          "label": "SEMANTIC top k",
+          "type": "int",
+          "default": 100,
+          "min": 1,
+          "max": 184704
+        },
+        {
+          "id": "semantic_repetition_penalty",
+          "label": "SEMANTIC repetition penalty",
+          "type": "float",
+          "default": 1.2,
+          "min": 1e-06,
+          "max": 100
+        },
+        {
+          "id": "semantic_penalty_window",
+          "label": "SEMANTIC penalty window",
+          "type": "int",
+          "default": 50,
+          "min": 1,
+          "max": 100
+        },
+        {
+          "id": "semantic_min_tokens",
+          "label": "SEMANTIC min tokens",
+          "type": "int",
+          "default": 200,
+          "min": 0,
+          "max": 24576
+        },
+        {
+          "id": "semantic_max_tokens",
+          "label": "SEMANTIC max tokens",
+          "type": "int",
+          "default": 9000,
+          "min": 1,
+          "max": 24576
+        },
+        {
+          "id": "ode_steps",
+          "label": "Acoustic midpoint ODE steps",
+          "type": "int",
+          "default": 32,
+          "min": 1,
+          "max": 1000
+        }
+      ]
+    },
+    {
+      "id": "render-plan",
+      "name": "YuE2 \u00b7 Render Exact Saved Plan",
+      "input": "text",
+      "output": "audio",
+      "params_schema": [
+        {
+          "id": "bundle_path",
+          "label": "Bundle / native artifact directory",
+          "type": "string",
+          "default": "",
+          "pickerIntent": "folder"
+        },
+        {
+          "id": "device",
+          "label": "Device",
+          "type": "select",
+          "default": "cuda",
+          "options": [
+            {
+              "value": "cuda",
+              "label": "cuda"
+            },
+            {
+              "value": "cpu",
+              "label": "cpu"
+            }
+          ]
+        },
+        {
+          "id": "backend",
+          "label": "AR backend",
+          "type": "select",
+          "default": "torch",
+          "options": [
+            {
+              "value": "torch",
+              "label": "torch"
+            },
+            {
+              "value": "torch-eager",
+              "label": "torch-eager"
+            },
+            {
+              "value": "vllm",
+              "label": "vllm"
+            }
+          ]
+        },
+        {
+          "id": "quantization",
+          "label": "AR quantization (FP8 experimental)",
+          "type": "select",
+          "default": "none",
+          "options": [
+            {
+              "value": "none",
+              "label": "none"
+            },
+            {
+              "value": "fp8",
+              "label": "fp8"
+            }
+          ]
+        },
+        {
+          "id": "memory_budget_gib",
+          "label": "GPU memory budget (GiB)",
+          "type": "float",
+          "default": 24,
+          "min": 3,
+          "max": 512
+        },
+        {
+          "id": "offload_ar",
+          "label": "Offload AR during acoustic synthesis",
+          "type": "select",
+          "default": "false",
+          "options": [
+            {
+              "value": "false",
+              "label": "false"
+            },
+            {
+              "value": "true",
+              "label": "true"
+            }
+          ]
+        },
+        {
+          "id": "decoder",
+          "label": "VAE decoder",
+          "type": "select",
+          "default": "default",
+          "options": [
+            {
+              "value": "default",
+              "label": "default"
+            },
+            {
+              "value": "legacy",
+              "label": "legacy"
+            }
+          ]
+        },
+        {
+          "id": "vae_core_frames",
+          "label": "VAE core frames (0 = native default)",
+          "type": "int",
+          "default": 0,
+          "min": 0,
+          "max": 24576
+        },
+        {
+          "id": "full_decode",
+          "label": "Full VAE decode instead of tiled",
+          "type": "select",
+          "default": "false",
+          "options": [
+            {
+              "value": "false",
+              "label": "false"
+            },
+            {
+              "value": "true",
+              "label": "true"
+            }
+          ]
+        },
+        {
+          "id": "audio_format",
+          "label": "Primary audio format",
+          "type": "select",
+          "default": "wav",
+          "options": [
+            {
+              "value": "wav",
+              "label": "wav"
+            },
+            {
+              "value": "flac",
+              "label": "flac"
+            }
+          ]
+        },
+        {
+          "id": "semantic_temperature",
+          "label": "SEMANTIC temperature",
+          "type": "float",
+          "default": 1.0,
+          "min": 0,
+          "max": 5
+        },
+        {
+          "id": "semantic_top_p",
+          "label": "SEMANTIC top p",
+          "type": "float",
+          "default": 0.95,
+          "min": 1e-06,
+          "max": 1
+        },
+        {
+          "id": "semantic_top_k",
+          "label": "SEMANTIC top k",
+          "type": "int",
+          "default": 100,
+          "min": 1,
+          "max": 184704
+        },
+        {
+          "id": "semantic_repetition_penalty",
+          "label": "SEMANTIC repetition penalty",
+          "type": "float",
+          "default": 1.2,
+          "min": 1e-06,
+          "max": 100
+        },
+        {
+          "id": "semantic_penalty_window",
+          "label": "SEMANTIC penalty window",
+          "type": "int",
+          "default": 50,
+          "min": 1,
+          "max": 100
+        },
+        {
+          "id": "semantic_min_tokens",
+          "label": "SEMANTIC min tokens",
+          "type": "int",
+          "default": 200,
+          "min": 0,
+          "max": 24576
+        },
+        {
+          "id": "semantic_max_tokens",
+          "label": "SEMANTIC max tokens",
+          "type": "int",
+          "default": 9000,
+          "min": 1,
+          "max": 24576
+        },
+        {
+          "id": "ode_steps",
+          "label": "Acoustic midpoint ODE steps",
+          "type": "int",
+          "default": 32,
+          "min": 1,
+          "max": 1000
+        }
+      ]
+    },
+    {
+      "id": "semantic",
+      "name": "YuE2 \u00b7 Plan to Semantic Tokens",
+      "input": "text",
+      "output": "text",
+      "params_schema": [
+        {
+          "id": "bundle_path",
+          "label": "Bundle / native artifact directory",
+          "type": "string",
+          "default": "",
+          "pickerIntent": "folder"
+        },
+        {
+          "id": "device",
+          "label": "Device",
+          "type": "select",
+          "default": "cuda",
+          "options": [
+            {
+              "value": "cuda",
+              "label": "cuda"
+            },
+            {
+              "value": "cpu",
+              "label": "cpu"
+            }
+          ]
+        },
+        {
+          "id": "backend",
+          "label": "AR backend",
+          "type": "select",
+          "default": "torch",
+          "options": [
+            {
+              "value": "torch",
+              "label": "torch"
+            },
+            {
+              "value": "torch-eager",
+              "label": "torch-eager"
+            },
+            {
+              "value": "vllm",
+              "label": "vllm"
+            }
+          ]
+        },
+        {
+          "id": "quantization",
+          "label": "AR quantization (FP8 experimental)",
+          "type": "select",
+          "default": "none",
+          "options": [
+            {
+              "value": "none",
+              "label": "none"
+            },
+            {
+              "value": "fp8",
+              "label": "fp8"
+            }
+          ]
+        },
+        {
+          "id": "memory_budget_gib",
+          "label": "GPU memory budget (GiB)",
+          "type": "float",
+          "default": 24,
+          "min": 3,
+          "max": 512
+        },
+        {
+          "id": "semantic_temperature",
+          "label": "SEMANTIC temperature",
+          "type": "float",
+          "default": 1.0,
+          "min": 0,
+          "max": 5
+        },
+        {
+          "id": "semantic_top_p",
+          "label": "SEMANTIC top p",
+          "type": "float",
+          "default": 0.95,
+          "min": 1e-06,
+          "max": 1
+        },
+        {
+          "id": "semantic_top_k",
+          "label": "SEMANTIC top k",
+          "type": "int",
+          "default": 100,
+          "min": 1,
+          "max": 184704
+        },
+        {
+          "id": "semantic_repetition_penalty",
+          "label": "SEMANTIC repetition penalty",
+          "type": "float",
+          "default": 1.2,
+          "min": 1e-06,
+          "max": 100
+        },
+        {
+          "id": "semantic_penalty_window",
+          "label": "SEMANTIC penalty window",
+          "type": "int",
+          "default": 50,
+          "min": 1,
+          "max": 100
+        },
+        {
+          "id": "semantic_min_tokens",
+          "label": "SEMANTIC min tokens",
+          "type": "int",
+          "default": 200,
+          "min": 0,
+          "max": 24576
+        },
+        {
+          "id": "semantic_max_tokens",
+          "label": "SEMANTIC max tokens",
+          "type": "int",
+          "default": 9000,
+          "min": 1,
+          "max": 24576
+        }
+      ]
+    },
+    {
+      "id": "synthesize",
+      "name": "YuE2 \u00b7 Semantic Tokens to Latents",
+      "input": "text",
+      "output": "text",
+      "params_schema": [
+        {
+          "id": "bundle_path",
+          "label": "Bundle / native artifact directory",
+          "type": "string",
+          "default": "",
+          "pickerIntent": "folder"
+        },
+        {
+          "id": "device",
+          "label": "Device",
+          "type": "select",
+          "default": "cuda",
+          "options": [
+            {
+              "value": "cuda",
+              "label": "cuda"
+            },
+            {
+              "value": "cpu",
+              "label": "cpu"
+            }
+          ]
+        },
+        {
+          "id": "memory_budget_gib",
+          "label": "GPU memory budget (GiB)",
+          "type": "float",
+          "default": 24,
+          "min": 3,
+          "max": 512
+        },
+        {
+          "id": "offload_ar",
+          "label": "Offload AR during acoustic synthesis",
+          "type": "select",
+          "default": "false",
+          "options": [
+            {
+              "value": "false",
+              "label": "false"
+            },
+            {
+              "value": "true",
+              "label": "true"
+            }
+          ]
+        },
+        {
+          "id": "ode_steps",
+          "label": "Acoustic midpoint ODE steps",
+          "type": "int",
+          "default": 32,
+          "min": 1,
+          "max": 1000
+        }
+      ]
+    },
+    {
+      "id": "decode",
+      "name": "YuE2 \u00b7 Decode Audio Latents",
+      "input": "text",
+      "output": "audio",
+      "params_schema": [
+        {
+          "id": "bundle_path",
+          "label": "Bundle / native artifact directory",
+          "type": "string",
+          "default": "",
+          "pickerIntent": "folder"
+        },
+        {
+          "id": "device",
+          "label": "Device",
+          "type": "select",
+          "default": "cuda",
+          "options": [
+            {
+              "value": "cuda",
+              "label": "cuda"
+            },
+            {
+              "value": "cpu",
+              "label": "cpu"
+            }
+          ]
+        },
+        {
+          "id": "decoder",
+          "label": "VAE decoder",
+          "type": "select",
+          "default": "default",
+          "options": [
+            {
+              "value": "default",
+              "label": "default"
+            },
+            {
+              "value": "legacy",
+              "label": "legacy"
+            }
+          ]
+        },
+        {
+          "id": "vae_core_frames",
+          "label": "VAE core frames (0 = native default)",
+          "type": "int",
+          "default": 0,
+          "min": 0,
+          "max": 24576
+        },
+        {
+          "id": "full_decode",
+          "label": "Full VAE decode instead of tiled",
+          "type": "select",
+          "default": "false",
+          "options": [
+            {
+              "value": "false",
+              "label": "false"
+            },
+            {
+              "value": "true",
+              "label": "true"
+            }
+          ]
+        },
+        {
+          "id": "audio_format",
+          "label": "Primary audio format",
+          "type": "select",
+          "default": "wav",
+          "options": [
+            {
+              "value": "wav",
+              "label": "wav"
+            },
+            {
+              "value": "flac",
+              "label": "flac"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "encode",
+      "name": "YuE2 \u00b7 Encode Audio (VAE, not transcription)",
+      "input": "audio",
+      "output": "text",
+      "params_schema": [
+        {
+          "id": "audio_path",
+          "label": "48 kHz stereo WAV/FLAC path",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "id": "device",
+          "label": "Device",
+          "type": "select",
+          "default": "cuda",
+          "options": [
+            {
+              "value": "cuda",
+              "label": "cuda"
+            },
+            {
+              "value": "cpu",
+              "label": "cpu"
+            }
+          ]
+        },
+        {
+          "id": "decoder",
+          "label": "VAE encoder",
+          "type": "select",
+          "default": "default",
+          "options": [
+            {
+              "value": "default",
+              "label": "default"
+            },
+            {
+              "value": "legacy",
+              "label": "legacy"
+            }
+          ]
+        },
+        {
+          "id": "posterior_sample",
+          "label": "Sample posterior (off = posterior mean)",
+          "type": "select",
+          "default": "false",
+          "options": [
+            {
+              "value": "false",
+              "label": "false"
+            },
+            {
+              "value": "true",
+              "label": "true"
+            }
+          ]
+        },
+        {
+          "id": "save_posterior_info",
+          "label": "Save mean, scale and stdev",
+          "type": "select",
+          "default": "false",
+          "options": [
+            {
+              "value": "false",
+              "label": "false"
+            },
+            {
+              "value": "true",
+              "label": "true"
+            }
+          ]
+        },
+        {
+          "id": "seed",
+          "label": "Posterior seed",
+          "type": "int",
+          "default": 831001,
+          "min": 0,
+          "max": 2147483647
+        }
+      ]
+    },
+    {
+      "id": "inspect-audio",
+      "name": "YuE2 \u00b7 Audio to Score / Artifacts",
+      "input": "audio",
+      "output": "text",
+      "params_schema": [
+        {
+          "id": "extract",
+          "label": "Text to return",
+          "type": "select",
+          "default": "descriptor",
+          "options": [
+            {
+              "value": "descriptor",
+              "label": "descriptor"
+            },
+            {
+              "value": "abc",
+              "label": "abc"
+            },
+            {
+              "value": "request",
+              "label": "request"
+            },
+            {
+              "value": "metadata",
+              "label": "metadata"
+            },
+            {
+              "value": "agent-package",
+              "label": "agent-package"
+            },
+            {
+              "value": "verify",
+              "label": "verify"
+            }
+          ]
+        },
+        {
+          "id": "bundle_path",
+          "label": "Bundle / native artifact directory",
+          "type": "string",
+          "default": "",
+          "pickerIntent": "folder"
+        }
+      ]
+    },
+    {
+      "id": "inspect-bundle",
+      "name": "YuE2 \u00b7 Inspect Bundle / Agent Package",
+      "input": "text",
+      "output": "text",
+      "params_schema": [
+        {
+          "id": "extract",
+          "label": "Text to return",
+          "type": "select",
+          "default": "descriptor",
+          "options": [
+            {
+              "value": "descriptor",
+              "label": "descriptor"
+            },
+            {
+              "value": "abc",
+              "label": "abc"
+            },
+            {
+              "value": "request",
+              "label": "request"
+            },
+            {
+              "value": "metadata",
+              "label": "metadata"
+            },
+            {
+              "value": "agent-package",
+              "label": "agent-package"
+            },
+            {
+              "value": "verify",
+              "label": "verify"
+            }
+          ]
+        },
+        {
+          "id": "bundle_path",
+          "label": "Bundle / native artifact directory",
+          "type": "string",
+          "default": "",
+          "pickerIntent": "folder"
+        }
+      ]
+    },
+    {
+      "id": "import-artifacts",
+      "name": "YuE2 \u00b7 Import Native Saved Artifacts",
+      "input": "text",
+      "output": "text",
+      "params_schema": [
+        {
+          "id": "bundle_path",
+          "label": "Bundle / native artifact directory",
+          "type": "string",
+          "default": "",
+          "pickerIntent": "folder"
+        }
+      ]
+    },
+    {
+      "id": "batch",
+      "name": "YuE2 \u00b7 Batch Requests / Resume",
+      "input": "text",
+      "output": "text",
+      "params_schema": [
+        {
+          "id": "requests_file",
+          "label": "Requests JSON / JSONL",
+          "type": "string",
+          "default": "",
+          "pickerIntent": "text"
+        },
+        {
+          "id": "resume_directory",
+          "label": "Existing YuE2 batch directory (optional)",
+          "type": "string",
+          "default": "",
+          "pickerIntent": "folder"
+        },
+        {
+          "id": "song_id",
+          "label": "Song identifier",
+          "type": "string",
+          "default": "song"
+        },
+        {
+          "id": "style",
+          "label": "Style tags",
+          "type": "string",
+          "default": "cinematic, warm vocals, piano"
+        },
+        {
+          "id": "lyrics",
+          "label": "Lyrics (text input takes priority)",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "id": "lyrics_file",
+          "label": "Lyrics file",
+          "type": "string",
+          "default": "",
+          "pickerIntent": "text"
+        },
+        {
+          "id": "cot",
+          "label": "Symbolic planning",
+          "type": "select",
+          "default": "full",
+          "options": [
+            {
+              "value": "full",
+              "label": "full"
+            },
+            {
+              "value": "melody",
+              "label": "melody"
+            },
+            {
+              "value": "off",
+              "label": "off"
+            }
+          ]
+        },
+        {
+          "id": "seed",
+          "label": "Seed",
+          "type": "int",
+          "default": 831001,
+          "min": 0,
+          "max": 2147483647
+        },
+        {
+          "id": "cfg_mode",
+          "label": "CFG",
+          "type": "select",
+          "default": "native",
+          "options": [
+            {
+              "value": "native",
+              "label": "native"
+            },
+            {
+              "value": "custom",
+              "label": "custom"
+            }
+          ]
+        },
+        {
+          "id": "cfg_scale",
+          "label": "Custom CFG scale",
+          "type": "float",
+          "default": 1.0,
+          "min": 0,
+          "max": 20
+        },
+        {
+          "id": "device",
+          "label": "Device",
+          "type": "select",
+          "default": "cuda",
+          "options": [
+            {
+              "value": "cuda",
+              "label": "cuda"
+            },
+            {
+              "value": "cpu",
+              "label": "cpu"
+            }
+          ]
+        },
+        {
+          "id": "backend",
+          "label": "AR backend",
+          "type": "select",
+          "default": "torch",
+          "options": [
+            {
+              "value": "torch",
+              "label": "torch"
+            },
+            {
+              "value": "torch-eager",
+              "label": "torch-eager"
+            },
+            {
+              "value": "vllm",
+              "label": "vllm"
+            }
+          ]
+        },
+        {
+          "id": "quantization",
+          "label": "AR quantization (FP8 experimental)",
+          "type": "select",
+          "default": "none",
+          "options": [
+            {
+              "value": "none",
+              "label": "none"
+            },
+            {
+              "value": "fp8",
+              "label": "fp8"
+            }
+          ]
+        },
+        {
+          "id": "memory_budget_gib",
+          "label": "GPU memory budget (GiB)",
+          "type": "float",
+          "default": 24,
+          "min": 3,
+          "max": 512
+        },
+        {
+          "id": "offload_ar",
+          "label": "Offload AR during acoustic synthesis",
+          "type": "select",
+          "default": "false",
+          "options": [
+            {
+              "value": "false",
+              "label": "false"
+            },
+            {
+              "value": "true",
+              "label": "true"
+            }
+          ]
+        },
+        {
+          "id": "decoder",
+          "label": "VAE decoder",
+          "type": "select",
+          "default": "default",
+          "options": [
+            {
+              "value": "default",
+              "label": "default"
+            },
+            {
+              "value": "legacy",
+              "label": "legacy"
+            }
+          ]
+        },
+        {
+          "id": "vae_core_frames",
+          "label": "VAE core frames (0 = native default)",
+          "type": "int",
+          "default": 0,
+          "min": 0,
+          "max": 24576
+        },
+        {
+          "id": "full_decode",
+          "label": "Full VAE decode instead of tiled",
+          "type": "select",
+          "default": "false",
+          "options": [
+            {
+              "value": "false",
+              "label": "false"
+            },
+            {
+              "value": "true",
+              "label": "true"
+            }
+          ]
+        },
+        {
+          "id": "audio_format",
+          "label": "Primary audio format",
+          "type": "select",
+          "default": "wav",
+          "options": [
+            {
+              "value": "wav",
+              "label": "wav"
+            },
+            {
+              "value": "flac",
+              "label": "flac"
+            }
+          ]
+        },
+        {
+          "id": "abc_temperature",
+          "label": "ABC temperature",
+          "type": "float",
+          "default": 0.7,
+          "min": 0,
+          "max": 5
+        },
+        {
+          "id": "abc_top_p",
+          "label": "ABC top p",
+          "type": "float",
+          "default": 0.9,
+          "min": 1e-06,
+          "max": 1
+        },
+        {
+          "id": "abc_top_k",
+          "label": "ABC top k",
+          "type": "int",
+          "default": 30,
+          "min": 1,
+          "max": 184704
+        },
+        {
+          "id": "abc_repetition_penalty",
+          "label": "ABC repetition penalty",
+          "type": "float",
+          "default": 1.005,
+          "min": 1e-06,
+          "max": 100
+        },
+        {
+          "id": "abc_penalty_window",
+          "label": "ABC penalty window",
+          "type": "int",
+          "default": 100,
+          "min": 1,
+          "max": 100
+        },
+        {
+          "id": "abc_min_tokens",
+          "label": "ABC min tokens",
+          "type": "int",
+          "default": 32,
+          "min": 0,
+          "max": 24576
+        },
+        {
+          "id": "abc_max_tokens",
+          "label": "ABC max tokens",
+          "type": "int",
+          "default": 4096,
+          "min": 1,
+          "max": 24576
+        },
+        {
+          "id": "semantic_temperature",
+          "label": "SEMANTIC temperature",
+          "type": "float",
+          "default": 1.0,
+          "min": 0,
+          "max": 5
+        },
+        {
+          "id": "semantic_top_p",
+          "label": "SEMANTIC top p",
+          "type": "float",
+          "default": 0.95,
+          "min": 1e-06,
+          "max": 1
+        },
+        {
+          "id": "semantic_top_k",
+          "label": "SEMANTIC top k",
+          "type": "int",
+          "default": 100,
+          "min": 1,
+          "max": 184704
+        },
+        {
+          "id": "semantic_repetition_penalty",
+          "label": "SEMANTIC repetition penalty",
+          "type": "float",
+          "default": 1.2,
+          "min": 1e-06,
+          "max": 100
+        },
+        {
+          "id": "semantic_penalty_window",
+          "label": "SEMANTIC penalty window",
+          "type": "int",
+          "default": 50,
+          "min": 1,
+          "max": 100
+        },
+        {
+          "id": "semantic_min_tokens",
+          "label": "SEMANTIC min tokens",
+          "type": "int",
+          "default": 200,
+          "min": 0,
+          "max": 24576
+        },
+        {
+          "id": "semantic_max_tokens",
+          "label": "SEMANTIC max tokens",
+          "type": "int",
+          "default": 9000,
+          "min": 1,
+          "max": 24576
+        },
+        {
+          "id": "ode_steps",
+          "label": "Acoustic midpoint ODE steps",
+          "type": "int",
+          "default": 32,
+          "min": 1,
+          "max": 1000
+        }
+      ]
+    },
+    {
+      "id": "diagnostics",
+      "name": "YuE2 \u00b7 Installation Diagnostics",
+      "input": "text",
+      "output": "text",
+      "params_schema": []
+    }
+  ]
+}
