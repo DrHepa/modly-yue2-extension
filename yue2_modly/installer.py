@@ -51,10 +51,26 @@ def choose_lane(identity: dict, context: dict) -> dict:
         else:
             reported = int(text)
         if reported < 128:
-            raise ValueError("[CUDA_LANE_UNSUPPORTED] The pinned PyTorch 2.10 cu128 lane requires a driver compatible with CUDA 12.8; update the driver or deliberately use CPU")
+            raise ValueError("[CUDA_LANE_UNSUPPORTED] The pinned PyTorch CUDA lane requires a driver compatible with CUDA 12.8; update the driver or deliberately use CPU")
+    # NVIDIA GB10 is SM 12.1.  The published ARM64 cu128 wheel advertises
+    # support only through SM 12.0 and fails even on a tiny CUDA kernel.
+    # Modly's current GPU probe caps its reported CUDA value at 12.8, so the
+    # SM 12.1 evidence is the authoritative selector for the validated cu130
+    # ARM64 lane.
+    gb10 = system == "Linux" and arch == "aarch64" and int(context.get("gpu_sm", 0)) >= 121
+    if gb10 and accelerator == "cuda":
+        flavor, minimum = "cu130", 130
+        if reported and reported not in (128, 129) and reported < minimum:
+            raise ValueError("[CUDA_LANE_UNSUPPORTED] GB10 requires a driver compatible with CUDA 13.0")
+    else:
+        flavor, minimum = "cu128", 128
+        if accelerator == "cuda" and reported and reported < minimum:
+            raise ValueError("[CUDA_LANE_UNSUPPORTED] The pinned PyTorch cu128 lane requires a driver compatible with CUDA 12.8; update the driver or deliberately use CPU")
+    torch_spec = "torch==2.10.0+" + flavor if accelerator == "cuda" else "torch==2.10.0"
     return {"name": "modly-cp311" if identity["version"][1] == 11 else "private-cp312",
             "python":identity["version"], "system":system, "arch":arch, "accelerator":accelerator,
-            "torch":"2.10.0", "torch_spec":"torch==2.10.0+cu128" if accelerator == "cuda" else "torch==2.10.0", "index": "https://download.pytorch.org/whl/" + ("cu128" if accelerator == "cuda" else "cpu")}
+            "torch":"2.10.0", "torch_spec":torch_spec, "index": "https://download.pytorch.org/whl/" + (flavor if accelerator == "cuda" else "cpu"),
+            "cuda_flavor": flavor}
 
 
 def run(command, label, env=None):

@@ -1,6 +1,6 @@
 # YuE2 for Modly — process extension
 
-**Version 0.1.0 — implementation candidate, not GPU-certified.** This repository implements the published YuE2 inference API as thirteen Modly process nodes. Its contract and adapter tests pass locally; clean installation, pinned-runtime imports, full-model inference, GPU memory use and Modly UI integration still require testing on the target machines. See [validation status](docs/VALIDATION.md).
+**Version 0.1.0 — validated on the local Modly GB10 host.** This repository implements the published YuE2 inference API as thirteen Modly process nodes. The pinned runtime, all three checkpoints, real CUDA generation and every node's smoke path have been exercised on Linux ARM64/GB10; other platforms remain separate candidate lanes. See [validation status](docs/VALIDATION.md).
 
 ## Target and upstream
 
@@ -16,7 +16,7 @@ Install this extension using Modly's **Install from GitHub** action with:
 https://github.com/DrHepa/modly-yue2-extension
 ```
 
-This is the extension repository. Do not paste the upstream YuE repository as the extension repository: it is the model source, not this Modly wrapper. The first published version remains an implementation candidate, not a GPU-certified release.
+This is the extension repository. Do not paste the upstream YuE repository as the extension repository: it is the model source, not this Modly wrapper.
 
 For local development, extract the package and install its root folder as a local extension. Local-folder installation in the inspected host links the directory but does not provision dependencies; run **Repair** where available or invoke root `setup.py` with Modly's exact Python executable and its normal setup JSON. Restart/reload extensions after changing the active Python lane.
 
@@ -39,7 +39,7 @@ The optional `setup-config.json` can be copied from `setup-config.example.json`.
 
 These are **alternative host-derived lanes**, not an automatic replacement of public Modly's Python. The extension does not download an unrelated Python 3.12, mutate Modly's own environment or assume a particular 3.11 patch version. An incompatible previous extension venv is preserved as `venv.previous-*`; weights stay outside it. No simultaneous dual-runtime daemon is installed.
 
-The installer has branches for Windows x86_64, Linux x86_64 and Linux ARM64. The pinned CUDA lane uses **PyTorch 2.10.0+cu128**; published wheel entries exist for CPython 3.11 and 3.12 on those platforms. This establishes a packaging route, **not demonstrated end-to-end compatibility**. Linux requires the wheel's glibc floor (2.28). Upstream's documented reference execution is Linux/NVIDIA BF16; Windows and ARM64 full-model validation remain pending.
+The installer has branches for Windows x86_64, Linux x86_64 and Linux ARM64. Linux ARM64 GB10/SM121 selects the validated **PyTorch 2.10.0+cu130** lane; the generic CUDA lanes use **PyTorch 2.10.0+cu128**. Linux requires the wheel's glibc floor (2.28). The local GB10 lane has passed native BF16 and real YuE2 inference; Windows and Linux x86_64 remain untested here.
 
 Dependencies use binary wheels, with no automatic compilation fallback. Optional `vllm==0.19.0` and `triton==3.6.0` are Linux-only and fail clearly if a compatible wheel/dependency solution is unavailable. Optional fast execution has not been validated here. Direct dependencies are pinned; installed transitive versions are recorded by `pip freeze`, not a universal per-platform hash lock.
 
@@ -132,7 +132,7 @@ Run these **with the provisioned extension venv Python**, not the host's unrelat
 <extension-venv-python> tools/smoke.py --workspace <absolute-test-workspace>
 ```
 
-The real smoke test uses a deliberately short token cap and may report truncation. It validates real audio and artifacts, not musical quality. No real smoke test is claimed in this delivery. Review `docs/VALIDATION.md` before installation or registry submission.
+The real smoke test uses deliberately short token caps and may report truncation. It validates real audio and artifacts, not musical quality. The local GB10 run produced verified 48 kHz stereo audio and exercised all thirteen nodes. Review `docs/VALIDATION.md` before installation or registry submission.
 
 ## Licensing
 

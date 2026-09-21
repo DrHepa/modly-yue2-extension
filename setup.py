@@ -65,7 +65,29 @@ def setup(context):
             raise ValueError("install_fast requires Linux CUDA; native Windows vLLM is not supported")
         run([python,"-m","pip","install","--only-binary=:all:","vllm==0.19.0","triton==3.6.0","-c",constraints],"Installing optional upstream fast backend; missing/conflicting wheels fail rather than compile",env)
     run([python,ROOT/"tools/check_native_api.py"],"Checking the installed upstream API signatures",env)
-    run([python,"-m","pip","check"],"Checking dependency consistency",env)
+    check = subprocess.run([str(python), "-m", "pip", "check"], cwd=ROOT, env=env,
+                           capture_output=True, text=True, encoding="utf-8", errors="replace")
+    if check.returncode:
+        report = (check.stdout + check.stderr).strip()
+        # PyTorch's ARM64 cu128 wheel depends on NVIDIA's SBSA cuSPARSELt
+        # package.  pip 25.3 does not consider the vendor's
+        # ``manylinux2014_sbsa`` tag compatible with the host's generic
+        # ``manylinux_aarch64`` tags, although the wheel is the published
+        # native dependency selected by PyTorch itself.  Keep pip check
+        # fatal for every other problem and validate this narrow exception
+        # through the native API check immediately below.
+        known_sbsa = {
+            "nvidia-cusparselt-cu12 0.7.1 is not supported on this platform",
+            "nvidia-cusparselt-cu13 0.8.0 is not supported on this platform",
+        }
+        reported_lines = {line.strip() for line in report.splitlines() if line.strip()}
+        allowed = (identity["system"] == "Linux" and identity["machine"].lower() in {"aarch64", "arm64"}
+                   and reported_lines and reported_lines <= known_sbsa)
+        if not allowed:
+            if report:
+                print(report, file=sys.stderr, flush=True)
+            raise subprocess.CalledProcessError(check.returncode, check.args)
+        log("pip check reported the known PyTorch ARM64 SBSA cuSPARSELt tag mismatch; native API validation remains mandatory")
     run([python,"-m","yue2_modly.health","--accelerator",lane["accelerator"]],"Checking imports and small native kernels before weight downloads",env)
     run([python,"-m","yue2_modly.provision","--models-root",models],"Provisioning/reusing all three pinned checkpoints",env)
     freeze = subprocess.run([str(python),"-m","pip","freeze"],check=True,capture_output=True,text=True,env=env)

@@ -1,0 +1,361 @@
+{
+  "id": "a8f1fb39-fb8d-4815-b642-ec8858255355",
+  "name": "YuE2 · Real Song Lab · Luz de regreso",
+  "description": "End-to-end validation graph for every YuE2 node: original song, editable score, ABC cover/edit, staged latent path, VAE round trip, artifact inspection/import, batch resume, and diagnostics. Run branches independently to reuse saved descriptors.",
+  "nodes": [
+    {
+      "id": "5a14ccb4-bb2e-4f76-a8c3-f16e41de06f6",
+      "type": "textNode",
+      "position": {
+        "x": -520,
+        "y": 40
+      },
+      "data": {
+        "enabled": true,
+        "showInGenerate": false,
+        "params": {
+          "text": "[Verse 1]\nLa ciudad despierta bajo un cielo azul,\nmis pasos siguen luces que me llevan tú.\n[Chorus]\nLuz de regreso, vuelve a cantar,\nuna canción completa para regresar.\n[Verse 2]\nSi cambia la noche, no cambia la voz,\nguarda este camino dentro del corazón."
+        }
+      }
+    },
+    {
+      "id": "a122c654-d91c-48e1-bf48-c7ce53620446",
+      "type": "textNode",
+      "position": {
+        "x": -520,
+        "y": 500
+      },
+      "data": {
+        "enabled": true,
+        "showInGenerate": false,
+        "params": {
+          "text": "X:1\nT:Luz de regreso (edit)\nM:4/4\nL:1/8\nQ:1/4=92\nK:C\n\"C\" C2 E2 G2 E2 | \"Am\" A2 G2 E2 C2 |\n\"F\" F2 A2 c2 A2 | \"G\" G4 z4 |\n"
+        }
+      }
+    },
+    {
+      "id": "3b4b5cd0-f96a-4be5-8cb0-d2a6d9c3d343",
+      "type": "textNode",
+      "position": {
+        "x": -520,
+        "y": 900
+      },
+      "data": {
+        "enabled": true,
+        "showInGenerate": false,
+        "params": {
+          "text": "[{\"song_id\":\"luz-regreso-original\",\"style\":\"cinematic pop, warm vocals, piano\",\"lyrics\":\"[Verse 1]\\nLa ciudad despierta bajo un cielo azul.\\n[Chorus]\\nLuz de regreso, vuelve a cantar.\"},{\"song_id\":\"luz-regreso-cover\",\"style\":\"acoustic folk, intimate vocal, guitar\",\"lyrics\":\"[Verse 1]\\nLa ciudad despierta bajo un cielo azul.\\n[Chorus]\\nLuz de regreso, vuelve a cantar.\"}]"
+        }
+      }
+    },
+    {
+      "id": "3357c4ff-3d7e-443b-83c4-08348e191cdf",
+      "type": "extensionNode",
+      "position": {
+        "x": 0,
+        "y": 40
+      },
+      "data": {
+        "extensionId": "modly-yue2-extension/generate",
+        "enabled": true,
+        "showInGenerate": true,
+        "params": {
+          "input_mode": "lyrics",
+          "song_id": "luz-regreso-original",
+          "style": "cinematic pop, warm vocals, piano",
+          "cot": "full",
+          "seed": 831001,
+          "device": "cuda",
+          "backend": "torch",
+          "audio_format": "wav"
+        }
+      }
+    },
+    {
+      "id": "647e94d3-eb45-4dcc-bcf2-ccfca23b6aec",
+      "type": "extensionNode",
+      "position": {
+        "x": 0,
+        "y": 300
+      },
+      "data": {
+        "extensionId": "modly-yue2-extension/plan",
+        "enabled": true,
+        "showInGenerate": true,
+        "params": {
+          "input_mode": "lyrics",
+          "song_id": "luz-regreso-plan",
+          "style": "cinematic pop, warm vocals, piano",
+          "cot": "full",
+          "seed": 831001,
+          "device": "cuda",
+          "backend": "torch"
+        }
+      }
+    },
+    {
+      "id": "5a078ca9-df63-4a23-b45b-f10668e10b16",
+      "type": "extensionNode",
+      "position": {
+        "x": 0,
+        "y": 620
+      },
+      "data": {
+        "extensionId": "modly-yue2-extension/render-abc",
+        "enabled": true,
+        "showInGenerate": true,
+        "params": {
+          "song_id": "luz-regreso-cover",
+          "style": "acoustic folk, intimate vocal, guitar",
+          "lyrics": "[Verse 1]\nLa ciudad despierta bajo un cielo azul,\nmis pasos siguen luces que me llevan tú.\n[Chorus]\nLuz de regreso, vuelve a cantar,\nuna canción completa para regresar.\n[Verse 2]\nSi cambia la noche, no cambia la voz,\nguarda este camino dentro del corazón.",
+          "cot": "full",
+          "seed": 831002,
+          "device": "cuda",
+          "backend": "torch",
+          "audio_format": "wav"
+        }
+      }
+    },
+    {
+      "id": "ef0c7cae-66dd-4b30-a191-7f5d6d2dd56b",
+      "type": "extensionNode",
+      "position": {
+        "x": 480,
+        "y": 300
+      },
+      "data": {
+        "extensionId": "modly-yue2-extension/render-plan",
+        "enabled": true,
+        "showInGenerate": true,
+        "params": {
+          "device": "cuda",
+          "backend": "torch",
+          "audio_format": "wav"
+        }
+      }
+    },
+    {
+      "id": "8b853e27-6cbb-4464-a55e-4a8b1d45421a",
+      "type": "extensionNode",
+      "position": {
+        "x": 960,
+        "y": 300
+      },
+      "data": {
+        "extensionId": "modly-yue2-extension/semantic",
+        "enabled": true,
+        "showInGenerate": true,
+        "params": {
+          "device": "cuda",
+          "backend": "torch"
+        }
+      }
+    },
+    {
+      "id": "9ee68c57-fe25-41fe-a2f1-c882f78c1398",
+      "type": "extensionNode",
+      "position": {
+        "x": 1440,
+        "y": 300
+      },
+      "data": {
+        "extensionId": "modly-yue2-extension/synthesize",
+        "enabled": true,
+        "showInGenerate": true,
+        "params": {
+          "device": "cuda",
+          "memory_budget_gib": 24
+        }
+      }
+    },
+    {
+      "id": "b32e4359-d2ef-47eb-a6c2-362710e48628",
+      "type": "extensionNode",
+      "position": {
+        "x": 1920,
+        "y": 300
+      },
+      "data": {
+        "extensionId": "modly-yue2-extension/decode",
+        "enabled": true,
+        "showInGenerate": true,
+        "params": {
+          "device": "cuda",
+          "decoder": "default",
+          "audio_format": "wav"
+        }
+      }
+    },
+    {
+      "id": "ab5ba63b-a9a8-4697-a5be-35c7a442aff5",
+      "type": "extensionNode",
+      "position": {
+        "x": 480,
+        "y": 40
+      },
+      "data": {
+        "extensionId": "modly-yue2-extension/encode",
+        "enabled": true,
+        "showInGenerate": true,
+        "params": {
+          "device": "cuda",
+          "decoder": "default",
+          "posterior_sample": false,
+          "save_posterior_info": true,
+          "seed": 831001
+        }
+      }
+    },
+    {
+      "id": "c4a97f30-877f-4315-af01-43a420393ebd",
+      "type": "extensionNode",
+      "position": {
+        "x": 2400,
+        "y": 520
+      },
+      "data": {
+        "extensionId": "modly-yue2-extension/inspect-audio",
+        "enabled": true,
+        "showInGenerate": true,
+        "params": {
+          "extract": "descriptor"
+        }
+      }
+    },
+    {
+      "id": "3be3230f-d4c3-4f04-9e53-313613865b36",
+      "type": "extensionNode",
+      "position": {
+        "x": 1920,
+        "y": 620
+      },
+      "data": {
+        "extensionId": "modly-yue2-extension/inspect-bundle",
+        "enabled": true,
+        "showInGenerate": true,
+        "params": {
+          "extract": "abc"
+        }
+      }
+    },
+    {
+      "id": "71bc7b1f-86fd-4d06-847a-54e41df0b001",
+      "type": "extensionNode",
+      "position": {
+        "x": 2400,
+        "y": 700
+      },
+      "data": {
+        "extensionId": "modly-yue2-extension/import-artifacts",
+        "enabled": true,
+        "showInGenerate": true,
+        "params": {}
+      }
+    },
+    {
+      "id": "ff81bcce-e05a-4606-ba36-7ce47635b3d6",
+      "type": "extensionNode",
+      "position": {
+        "x": 0,
+        "y": 980
+      },
+      "data": {
+        "extensionId": "modly-yue2-extension/batch",
+        "enabled": true,
+        "showInGenerate": true,
+        "params": {
+          "song_id": "luz-regreso-batch",
+          "style": "cinematic pop, warm vocals, piano",
+          "cot": "full",
+          "seed": 831003,
+          "device": "cuda",
+          "backend": "torch",
+          "audio_format": "wav"
+        }
+      }
+    },
+    {
+      "id": "b8c9a5af-9138-4891-a2dc-1cdf4e2c97f0",
+      "type": "extensionNode",
+      "position": {
+        "x": 480,
+        "y": 980
+      },
+      "data": {
+        "extensionId": "modly-yue2-extension/diagnostics",
+        "enabled": true,
+        "showInGenerate": true,
+        "params": {}
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "xy-edge__5a14ccb4-bb2e-4f76-a8c3-f16e41de06f6-3357c4ff-3d7e-443b-83c4-08348e191cdf",
+      "source": "5a14ccb4-bb2e-4f76-a8c3-f16e41de06f6",
+      "target": "3357c4ff-3d7e-443b-83c4-08348e191cdf"
+    },
+    {
+      "id": "xy-edge__5a14ccb4-bb2e-4f76-a8c3-f16e41de06f6-647e94d3-eb45-4dcc-bcf2-ccfca23b6aec",
+      "source": "5a14ccb4-bb2e-4f76-a8c3-f16e41de06f6",
+      "target": "647e94d3-eb45-4dcc-bcf2-ccfca23b6aec"
+    },
+    {
+      "id": "xy-edge__5a14ccb4-bb2e-4f76-a8c3-f16e41de06f6-ff81bcce-e05a-4606-ba36-7ce47635b3d6",
+      "source": "5a14ccb4-bb2e-4f76-a8c3-f16e41de06f6",
+      "target": "ff81bcce-e05a-4606-ba36-7ce47635b3d6"
+    },
+    {
+      "id": "xy-edge__a122c654-d91c-48e1-bf48-c7ce53620446-5a078ca9-df63-4a23-b45b-f10668e10b16",
+      "source": "a122c654-d91c-48e1-bf48-c7ce53620446",
+      "target": "5a078ca9-df63-4a23-b45b-f10668e10b16"
+    },
+    {
+      "id": "xy-edge__3357c4ff-3d7e-443b-83c4-08348e191cdf-ab5ba63b-a9a8-4697-a5be-35c7a442aff5",
+      "source": "3357c4ff-3d7e-443b-83c4-08348e191cdf",
+      "target": "ab5ba63b-a9a8-4697-a5be-35c7a442aff5"
+    },
+    {
+      "id": "xy-edge__647e94d3-eb45-4dcc-bcf2-ccfca23b6aec-ef0c7cae-66dd-4b30-a191-7f5d6d2dd56b",
+      "source": "647e94d3-eb45-4dcc-bcf2-ccfca23b6aec",
+      "target": "ef0c7cae-66dd-4b30-a191-7f5d6d2dd56b"
+    },
+    {
+      "id": "xy-edge__647e94d3-eb45-4dcc-bcf2-ccfca23b6aec-8b853e27-6cbb-4464-a55e-4a8b1d45421a",
+      "source": "647e94d3-eb45-4dcc-bcf2-ccfca23b6aec",
+      "target": "8b853e27-6cbb-4464-a55e-4a8b1d45421a"
+    },
+    {
+      "id": "xy-edge__8b853e27-6cbb-4464-a55e-4a8b1d45421a-9ee68c57-fe25-41fe-a2f1-c882f78c1398",
+      "source": "8b853e27-6cbb-4464-a55e-4a8b1d45421a",
+      "target": "9ee68c57-fe25-41fe-a2f1-c882f78c1398"
+    },
+    {
+      "id": "xy-edge__9ee68c57-fe25-41fe-a2f1-c882f78c1398-b32e4359-d2ef-47eb-a6c2-362710e48628",
+      "source": "9ee68c57-fe25-41fe-a2f1-c882f78c1398",
+      "target": "b32e4359-d2ef-47eb-a6c2-362710e48628"
+    },
+    {
+      "id": "xy-edge__b32e4359-d2ef-47eb-a6c2-362710e48628-c4a97f30-877f-4315-af01-43a420393ebd",
+      "source": "b32e4359-d2ef-47eb-a6c2-362710e48628",
+      "target": "c4a97f30-877f-4315-af01-43a420393ebd"
+    },
+    {
+      "id": "xy-edge__647e94d3-eb45-4dcc-bcf2-ccfca23b6aec-3be3230f-d4c3-4f04-9e53-313613865b36",
+      "source": "647e94d3-eb45-4dcc-bcf2-ccfca23b6aec",
+      "target": "3be3230f-d4c3-4f04-9e53-313613865b36"
+    },
+    {
+      "id": "xy-edge__3be3230f-d4c3-4f04-9e53-313613865b36-71bc7b1f-86fd-4d06-847a-54e41df0b001",
+      "source": "3be3230f-d4c3-4f04-9e53-313613865b36",
+      "target": "71bc7b1f-86fd-4d06-847a-54e41df0b001"
+    },
+    {
+      "id": "xy-edge__3b4b5cd0-f96a-4be5-8cb0-d2a6d9c3d343-ff81bcce-e05a-4606-ba36-7ce47635b3d6",
+      "source": "3b4b5cd0-f96a-4be5-8cb0-d2a6d9c3d343",
+      "target": "ff81bcce-e05a-4606-ba36-7ce47635b3d6"
+    }
+  ],
+  "createdAt": "2026-09-20T19:29:34.986804+00:00",
+  "updatedAt": "2026-09-20T19:29:34.986820+00:00"
+}

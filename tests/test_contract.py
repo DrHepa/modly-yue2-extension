@@ -156,6 +156,10 @@ class LaneTests(unittest.TestCase):
     def test_old_cuda_rejected(self):
         with self.assertRaisesRegex(ValueError,'CUDA_LANE_UNSUPPORTED'):
             choose_lane(self.identity(),{'cuda_version':124})
+    def test_gb10_sm121_selects_cu130_even_when_modly_caps_cuda_report(self):
+        lane=choose_lane(self.identity(),{'gpu_sm':121,'cuda_version':128,'accelerator':'cuda'})
+        self.assertEqual(lane['torch_spec'],'torch==2.10.0+cu130')
+        self.assertEqual(lane['index'],'https://download.pytorch.org/whl/cu130')
     def test_windows_arm_is_not_falsely_supported(self):
         with self.assertRaises(ValueError):choose_lane(self.identity('Windows','ARM64'),{})
     def test_git_blob_algorithm(self):
