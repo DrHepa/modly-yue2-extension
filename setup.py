@@ -7,6 +7,15 @@ import platform
 import subprocess
 import sys
 import traceback
+
+# Modly may execute setup.py through runpy/run_path rather than as a normal
+# script. In that mode sys.path[0] can be Modly's launcher directory instead
+# of this extension root, so make the bundled helper package importable before
+# loading any of its modules.
+_EXTENSION_ROOT = Path(__file__).resolve().parent
+if str(_EXTENSION_ROOT) not in sys.path:
+    sys.path.insert(0, str(_EXTENSION_ROOT))
+
 from yue2_modly.common import ROOT, STATE, clean_env, read_json, write_json, exclusive_lock
 from yue2_modly.config import boolean
 from yue2_modly.installer import probe, choose_lane, ensure_venv, ensure_source, run, log
