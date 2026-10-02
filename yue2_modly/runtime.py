@@ -115,6 +115,13 @@ def make_pipeline(ctx: Context, params: dict):
     device = params.get("device", "cuda")
     backend = params.get("backend", "torch")
     quant = params.get("quantization", "none")
+    flash_build = getattr(torch.backends.cuda, "is_flash_attention_available", lambda: False)
+    if device == "cuda" and platform.system() == "Windows" and backend == "torch" and not flash_build():
+        # The pinned GraphAR auto selector checks the FlashAttention operator's
+        # schema, not whether the Windows PyTorch wheel compiled its kernel.
+        # Avoid its direct _flash_attention_forward call on this unvalidated lane.
+        backend = "torch-eager"
+        ctx.log("Windows: PyTorch was built without FlashAttention; using torch-eager with available SDPA kernels instead of CUDA graphs.")
     if device == "cuda":
         if not torch.cuda.is_available():
             raise RuntimeError("[CUDA_UNAVAILABLE] This runtime cannot use CUDA. Check the installed lane and driver.")
@@ -150,7 +157,10 @@ def bundle_input(ctx: Context, params: dict):
 
 
 def metadata(pipe, params: dict, **extra) -> dict:
-    return dict(native_weights=pipe.weights, runtime_params=params, **extra)
+    effective_backend = getattr(pipe, "backend", params.get("backend"))
+    return dict(native_weights=pipe.weights,
+                runtime_params={**params, "backend": effective_backend},
+                requested_backend=params.get("backend"), **extra)
 
 
 def compatible_model(data: dict, pipe):
